@@ -1,36 +1,53 @@
 <?php get_header(); ?>
 <?php while(have_posts(  )){
 the_post(  );
+// Define Global Variables
+$PARENT_PAGE =wp_get_post_parent_id(get_the_ID());
+$CURRENT_PAGE = $PARENT_PAGE !=null ? $PARENT_PAGE : get_the_ID();
 ?>
 <div class="page-banner">
-      <div class="page-banner__bg-image" style="background-image: url(<?= get_theme_file_uri('images/ocean.jpg')?>)"></div>
-      <div class="page-banner__content container container--narrow">
+    <div class="page-banner__bg-image" style="background-image: url(<?= get_theme_file_uri('images/ocean.jpg')?>)">
+    </div>
+    <div class="page-banner__content container container--narrow">
         <h1 class="page-banner__title"><?php the_title(); ?></h1>
         <div class="page-banner__intro">
-          <p>Learn how the school of your dreams got started.</p>
+            <p>Learn how the school of your dreams got started.</p>
         </div>
-      </div>
     </div>
+</div>
 
-    <div class="container container--narrow page-section">
-      <div class="metabox metabox--position-up metabox--with-home-link">
+<div class="container container--narrow page-section">
+    <?php if($PARENT_PAGE){
+  ?> <div class="metabox metabox--position-up metabox--with-home-link">
         <p>
-          <a class="metabox__blog-home-link" href="#"><i class="fa fa-home" aria-hidden="true"></i> Back to About Us</a> <span class="metabox__main">Our History</span>
+            <a class="metabox__blog-home-link" href="<?= get_permalink($PARENT_PAGE) ?>"><i class="fa fa-home"
+                    aria-hidden="true"></i> Back to <?= get_the_title($PARENT_PAGE); ?></a> <span
+                class="metabox__main"><?= the_title(); ?></span>
         </p>
-      </div>
-
-      <!-- <div class="page-links">
-        <h2 class="page-links__title"><a href="#">About Us</a></h2>
-        <ul class="min-list">
-          <li class="current_page_item"><a href="#">Our History</a></li>
-          <li><a href="#">Our Goals</a></li>
-        </ul>
-      </div> -->
-
-      <div class="generic-content">
-      <?php the_content(); ?>
-      </div>
     </div>
+    <?php
+}  ?>
+    <?php
+    $IsParent = get_pages(['child_of' => get_the_ID()]);
+
+    if($PARENT_PAGE || $IsParent ){ ?>
+    <div class="page-links">
+        <h2 class="page-links__title"><a
+                href="<?= get_permalink($PARENT_PAGE) ?>"><?= get_the_title($PARENT_PAGE); ?></a></h2>
+        <ul class="min-list">
+            <?php
+            wp_list_pages([
+              'title_li'=>null,
+              'child_of'=>$CURRENT_PAGE
+              ]); ?>
+
+        </ul>
+    </div>
+    <?php } ?>
+    <div class="generic-content">
+        <?php the_content(); ?>
+    </div>
+</div>
 
 <?php
 }
