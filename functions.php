@@ -17,10 +17,28 @@ add_action("wp_enqueue_scripts","university_files");
 
 function university_feature(){
     add_theme_support('title-tag');
-register_nav_menu( "headerMenu", "Header Menu" );
-register_nav_menu( "footerMenu01", "Footer Explore Menu" );
-register_nav_menu( "footerMenu02", "Footer Learn Menu" );
+// register_nav_menu( "headerMenu", "Header Menu" );
+// register_nav_menu( "footerMenu01", "Footer Explore Menu" );
+// register_nav_menu( "footerMenu02", "Footer Learn Menu" );
 }
 
 
 add_action( 'after_setup_theme', "university_feature");
+
+
+function university_adjust_queries($query)
+{
+    if(!is_admin() && is_post_type_archive('event') && is_main_query()){
+        $today=date('Ymd');
+        $query->set('meta_key','event_date');
+        $query->set('orderby','meta_value_num');
+        $query->set('order','ASC');
+        $query->set('meta_query',[['key'=>'event_date',
+        'compare'=>'>=',
+        'value'=>$today,
+        'type'=>'numeric'
+        ]]);
+    }
+}
+
+add_action( 'pre_get_posts', "university_adjust_queries");

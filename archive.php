@@ -3,9 +3,13 @@
     <div class="page-banner__bg-image" style="background-image: url(<?= get_theme_file_uri('images/ocean.jpg')?>)">
     </div>
     <div class="page-banner__content container container--narrow">
-        <h1 class="page-banner__title">welcome to Blog</h1>
+        <h1 class="page-banner__title">
+            <?php //is_category() ==1 ? single_cat_title() :"" ; ?>
+            <?php //is_author() == 1 ? "post by ".get_the_author() : ""; ?>
+            <?= the_archive_title(); ?>
+        </h1>
         <div class="page-banner__intro">
-            <p>Learn how the school of your dreams got started.</p>
+            <p> <?= the_archive_description(); ?></p>
         </div>
     </div>
 </div>
