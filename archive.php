@@ -1,33 +1,28 @@
-<?php get_header(); ?>
-<div class="page-banner">
-    <div class="page-banner__bg-image" style="background-image: url(<?= get_theme_file_uri('images/ocean.jpg')?>)">
-    </div>
-    <div class="page-banner__content container container--narrow">
-        <h1 class="page-banner__title">
-            <?php //is_category() ==1 ? single_cat_title() :"" ; ?>
-            <?php //is_author() == 1 ? "post by ".get_the_author() : ""; ?>
-            <?= the_archive_title(); ?>
-        </h1>
-        <div class="page-banner__intro">
-            <p> <?= the_archive_description(); ?></p>
-        </div>
-    </div>
-</div>
+<?php get_header();
+pageBanner([
+    'title' => get_the_archive_title(),
+    'subtitle'=> get_the_author_description()
+]);
+?>
+
 <div class="container container--narrow page-section">
     <?php while(have_posts(  )){
         the_post(  );
+        $link=get_permalink();
+        $title=get_the_title();
+        $content= get_the_excerpt(  ) != null ? get_the_excerpt(  ) : wp_trim_words( get_the_content(), 18);
+        $author=get_the_author_posts_link();
+        $postTime=get_the_time('n.j.y');
+        $category=get_the_category_list( ',');
     ?>
 
     <div class="post-item">
-        <h2 class="headline headline--medium headline--post-title"><a
-                href="<?= the_permalink(); ?>"><?= the_title(); ?></a></h2>
+        <h2 class="headline headline--medium headline--post-title"><a href="<?= $link; ?>"><?= $title; ?></a></h2>
         <div class="metabox">
-            <p>posted by <?= the_author_posts_link();?> on <?= the_time('n.j.y'); ?> in
-                <?= get_the_category_list( ',') ?> </p>
+            <p>posted by <?=$author; ?> on <?= $postTime; ?> in<?=$category;?></p>
         </div>
-        <div class="generic-content">
-            <?= the_excerpt(  ); ?>
-            <p><a class="btn btn--blue" href="<?= the_permalink(); ?>">continue Reading</a></p>
+        <div class="generic-content"><?= $content; ?><p><a class="btn btn--blue" href="<?= $link; ?>">continue
+                    Reading</a></p>
         </div>
     </div>
     <?php
