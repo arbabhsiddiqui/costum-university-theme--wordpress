@@ -25,29 +25,17 @@ $CURRENT_PAGE = $PARENT_PAGE !=null ? $PARENT_PAGE : get_the_ID();
             </span>
         </p>
     </div>
-    <?php if($PARENT_PAGE){
-  ?>
-    <?php
-}  ?>
-    <?php
-    $IsParent = get_pages(['child_of' => get_the_ID()]);
-
-    if($PARENT_PAGE || $IsParent ){ ?>
-    <div class="page-links">
-        <h2 class="page-links__title"><a
-                href="<?= get_permalink($PARENT_PAGE) ?>"><?= get_the_title($PARENT_PAGE); ?></a></h2>
-        <ul class="min-list">
-            <?php
-            wp_list_pages([
-              'title_li'=>null,
-              'child_of'=>$CURRENT_PAGE
-              ]); ?>
-
-        </ul>
-    </div>
-    <?php } ?>
     <div class="generic-content">
-        <?php the_content(); ?>
+        <div class="row group">
+            <div class="one-third">
+
+                <?php the_post_thumbnail('professorPortraits');  ?>
+            </div>
+            <div class="two-third">
+
+                <?php the_content(); ?>
+            </div>
+        </div>
     </div>
 
     <?php
@@ -56,7 +44,7 @@ $CURRENT_PAGE = $PARENT_PAGE !=null ? $PARENT_PAGE : get_the_ID();
             foreach ($relatedPrograms as $program) {
                 ?>
     <hr class="section-break">
-    <h2 class="headline headline-medium">Related Program(s)</h2>
+    <h2 class="headline headline-medium">Subject(s) Taught</h2>
     <ul class="link-list min-list">
         <li>
             <a href="<?= get_the_permalink($program) ?>">
