@@ -1,13 +1,15 @@
 <?php get_header(); ?>
+
 <div class="page-banner">
     <div class="page-banner__bg-image"
-        style="background-image: url(<?= get_theme_file_uri("images/library-hero.jpg") ?>)"></div>
+        style="background-image: url(<?php echo get_theme_file_uri('/images/library-hero.jpg') ?>);"></div>
     <div class="page-banner__content container t-center c-white">
         <h1 class="headline headline--large">Welcome!</h1>
         <h2 class="headline headline--medium">We think you&rsquo;ll like it here.</h2>
         <h3 class="headline headline--small">Why don&rsquo;t you check out the <strong>major</strong> you&rsquo;re
             interested in?</h3>
-        <a href="<?= site_url( '/programs' ) ?>" class="btn btn--large btn--blue">Find Your Major</a>
+        <a href="<?php echo get_post_type_archive_link('program'); ?>" class="btn btn--large btn--blue">Find Your
+            Major</a>
     </div>
 </div>
 
@@ -15,99 +17,73 @@
     <div class="full-width-split__one">
         <div class="full-width-split__inner">
             <h2 class="headline headline--small-plus t-center">Upcoming Events</h2>
-            <?php
-            $today=date('Ymd');
-            $homePageEvent= new WP_Query([
-                'posts_per_page'=>2,
-                'post_type'=>'event',
-                'meta_key'=>'event_date',
-                'orderby'=>'meta_value_num',
-                'order'=>'ASC',
-                'meta_query' => [['key'=>'event_date',
-                'compare'=>'>=',
-                'value'=>$today,
-                'type'=>'numeric'
-                ]]
-            ]);
-            
-            while($homePageEvent->have_posts()){
-                $homePageEvent->the_post();
-                $Event_link =get_permalink();
-                $Event_Date=new DateTime(get_field('event_date'));
 
-               
-    ?>
-            <div class="event-summary">
-                <a class="event-summary__date t-center" href="<?= $Event_link; ?>">
-                    <span class="event-summary__month"><?= $Event_Date->format("M"); ?></span>
-                    <span class="event-summary__day"><?= $Event_Date->format("d"); ?></span>
-                </a>
-                <div class="event-summary__content">
-                    <h5 class="event-summary__title headline headline--tiny"><a
-                            href="<?= $Event_link; ?>"><?= the_title(); ?></a></h5>
-                    <p><?php if(has_excerpt()){
-                         echo get_the_excerpt();
-                    }else{
-                       echo wp_trim_words( get_the_content(), 18);
-                    } 
-                     ?> <a href="<?= $Event_link; ?>" class="nu gray">Learn
-                            more</a></p>
-                </div>
-            </div>
-            <?php }?>
+            <?php 
+          $today = date('Ymd');
+          $homepageEvents = new WP_Query(array(
+            'posts_per_page' => 2,
+            'post_type' => 'event',
+            'meta_key' => 'event_date',
+            'orderby' => 'meta_value_num',
+            'order' => 'ASC',
+            'meta_query' => array(
+              array(
+                'key' => 'event_date',
+                'compare' => '>=',
+                'value' => $today,
+                'type' => 'numeric'
+              )
+            )
+          ));
 
-            <p class="t-center no-margin"><a href="<?= get_post_type_archive_link('event'); ?>"
-                    class="btn btn--blue">View All
-                    Events</a></p>
+          while($homepageEvents->have_posts()) {
+            $homepageEvents->the_post();
+            get_template_part('template-parts/content', 'event');
+          }
+        ?>
+
+            <p class="t-center no-margin"><a href="<?php echo get_post_type_archive_link('event') ?>"
+                    class="btn btn--blue">View All Events</a></p>
+
         </div>
     </div>
     <div class="full-width-split__two">
         <div class="full-width-split__inner">
             <h2 class="headline headline--small-plus t-center">From Our Blogs</h2>
             <?php
-            $homePageBlog= new WP_Query([
-                'posts_per_page'=>2,
-                'post_type'=>'post'
-            ]);
-            
-            while($homePageBlog->have_posts()){
-                $homePageBlog->the_post();
-                $Post_link =get_permalink();;
-               
-    ?>
+          $homepagePosts = new WP_Query(array(
+            'posts_per_page' => 2
+          ));
+
+          while ($homepagePosts->have_posts()) {
+            $homepagePosts->the_post(); ?>
             <div class="event-summary">
-                <a class="event-summary__date event-summary__date--beige t-center" href="<?= $Post_link; ?>">
-                    <span class="event-summary__month"><?= the_time('M'); ?></span>
-                    <span class="event-summary__day"><?= the_time('d'); ?></span>
+                <a class="event-summary__date event-summary__date--beige t-center" href="<?php the_permalink(); ?>">
+                    <span class="event-summary__month"><?php the_time('M'); ?></span>
+                    <span class="event-summary__day"><?php the_time('d'); ?></span>
                 </a>
                 <div class="event-summary__content">
                     <h5 class="event-summary__title headline headline--tiny"><a
-                            href="<?= $Post_link; ?>"><?=  the_title(); ?></a>
-                    </h5>
-                    <p><?php if(has_excerpt()){
-                        echo get_the_excerpt();
-                    }else{
-                    
-                      echo  wp_trim_words( get_the_content(), 18);
-                    } 
-
-                     ?> <a href="<?= $Post_link; ?>" class="nu gray">Read
-                            more</a></p>
+                            href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
+                    <p><?php if (has_excerpt()) {
+                    echo get_the_excerpt();
+                  } else {
+                    echo wp_trim_words(get_the_content(), 18);
+                    } ?> <a href="<?php the_permalink(); ?>" class="nu gray">Read more</a></p>
                 </div>
             </div>
+            <?php } wp_reset_postdata();
+        ?>
 
 
-            <?php
-} wp_reset_postdata(  ); ?>
 
 
-
-            <p class="t-center no-margin"><a href="<?= get_post_type_archive_link('post'); ?>"
-                    class="btn btn--yellow">View All Blog
-                    Posts</a></p>
+            <p class="t-center no-margin"><a href="<?php echo site_url('/blog'); ?>" class="btn btn--yellow">View All
+                    Blog Posts</a></p>
         </div>
     </div>
 </div>
+
 <div class="hero-slider">
     <div data-glide-el="track" class="glide__track">
         <div class="glide__slides">
@@ -147,4 +123,6 @@
     </div>
 </div>
 
-<?php get_footer(); ?>
+<?php get_footer();
+
+?>

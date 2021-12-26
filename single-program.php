@@ -68,11 +68,8 @@ $CURRENT_PAGE = $PARENT_PAGE !=null ? $PARENT_PAGE : get_the_ID();
                 <span class="professor-card__name"><?= the_title(); ?></span>
             </a>
         </li>
-        <?php }?>
+        <?php } } wp_reset_postdata(  );?>
     </ul>
-    <?php
-            } wp_reset_postdata(  );?>
-
     <?php
             $today=date('Ymd');
             $RelateEvents= new WP_Query([
@@ -93,41 +90,16 @@ $CURRENT_PAGE = $PARENT_PAGE !=null ? $PARENT_PAGE : get_the_ID();
             ]
             ]);
             if($RelateEvents->have_posts(  )){
-           
             ?>
-
     <hr class="section-break">
     <h2 class="headline headline-medium">Upcoming <?= get_the_title(); ?> Events</h2>
-
     <?php
             while($RelateEvents->have_posts()){
                 $RelateEvents->the_post();
-                $Event_link =get_permalink();
-                $Event_Date=new DateTime(get_field('event_date'));
-
-               
+                get_template_part( 'template-parts/content', 'event');
+            }
+        }
     ?>
-    <div class="event-summary" style="margin-top:25px">
-        <a class="event-summary__date t-center" href="<?= $Event_link; ?>">
-            <span class="event-summary__month"><?= $Event_Date->format("M"); ?></span>
-            <span class="event-summary__day"><?= $Event_Date->format("d"); ?></span>
-        </a>
-        <div class="event-summary__content">
-            <h5 class="event-summary__title headline headline--tiny"><a
-                    href="<?= $Event_link; ?>"><?= the_title(); ?></a></h5>
-            <p><?php if(has_excerpt()){
-                         echo get_the_excerpt();
-                    }else{
-                       echo wp_trim_words( get_the_content(), 18);
-                    } 
-                     ?> <a href="<?= $Event_link; ?>" class="nu gray">Learn
-                    more</a></p>
-        </div>
-    </div>
-    <?php }?>
-
-    <?php
-            }?>
 </div>
 <?php
 }
