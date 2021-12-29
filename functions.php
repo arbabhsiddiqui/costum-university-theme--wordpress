@@ -1,4 +1,17 @@
 <?php 
+
+function university_custom_field()
+{
+    register_rest_field( "post", "authorName", [
+        'get_callback'=> function() {
+            return get_the_author();
+        }
+    ]);
+}
+
+add_action( "rest_api_init", 'university_custom_field' );
+
+
 function pageBanner($args=null)
 {
     $args['title'] = isset($args['title']) ==true ?  $args['title'] : get_the_title();
@@ -55,6 +68,11 @@ function university_files()
     wp_enqueue_style('university_main_styles', get_theme_file_uri('/build/style-index.css'));
     wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
 
+
+    // local
+    wp_localize_script( 'main-university-js', "universityData", [
+        'root_url' => get_site_url()
+    ] );
      
 }
 
@@ -79,6 +97,10 @@ add_action( 'after_setup_theme', "university_feature");
 
 function university_adjust_queries($query)
 {
+
+    if(!is_admin() && is_post_type_archive('campus') && is_main_query()){
+        $query->set('posts_per_page',-1);
+    }
 
     if(!is_admin() && is_post_type_archive('program') && is_main_query()){
         $query->set('orderby','title');

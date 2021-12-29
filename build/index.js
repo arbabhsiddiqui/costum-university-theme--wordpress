@@ -3892,13 +3892,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _css_style_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../css/style.scss */ "./css/style.scss");
 /* harmony import */ var _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/MobileMenu */ "./src/modules/MobileMenu.js");
 /* harmony import */ var _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/HeroSlider */ "./src/modules/HeroSlider.js");
+/* harmony import */ var _modules_search__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/search */ "./src/modules/search.js");
  // Our modules / classes
+
 
 
  // Instantiate a new object using our modules/classes
 
 const mobileMenu = new _modules_MobileMenu__WEBPACK_IMPORTED_MODULE_1__["default"]();
 const heroSlider = new _modules_HeroSlider__WEBPACK_IMPORTED_MODULE_2__["default"]();
+const search = new _modules_search__WEBPACK_IMPORTED_MODULE_3__["default"]();
 
 /***/ }),
 
@@ -3972,6 +3975,134 @@ class MobileMenu {
 
 /***/ }),
 
+/***/ "./src/modules/search.js":
+/*!*******************************!*\
+  !*** ./src/modules/search.js ***!
+  \*******************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jquery */ "jquery");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_0__);
+
+
+class Search {
+  // init variable
+  constructor() {
+    this.addSearchHTML();
+    this.resultDiv = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay__result");
+    this.openButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".js-search-trigger");
+    this.closeButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay__close");
+    this.overlay = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay");
+    this.searchTerm = jquery__WEBPACK_IMPORTED_MODULE_0___default()("#search-term");
+    this.event();
+    this.isOverlayOpen = 0;
+    this.isSpinnerLoaded = 0;
+    this.typingTimer;
+    this.previousValue;
+    this.baseUrl = `${universityData.root_url}/wp-json/wp/v2`;
+  } //   events
+
+
+  event() {
+    this.openButton.on("click", this.openOverlay.bind(this));
+    this.closeButton.on("click", this.closeOverlay.bind(this));
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).on("keydown", this.keyEvents.bind(this));
+    this.searchTerm.on("keyup", this.SearchTerm.bind(this));
+  } // functions
+
+
+  SearchTerm() {
+    if (this.previousValue != this.searchTerm.val()) {
+      clearTimeout(this.typingTimer);
+
+      if (this.searchTerm.val()) {
+        if (!this.isSpinnerLoaded) {
+          this.resultDiv.html(`<div class="spinner-loader"></div>`);
+          this.isSpinnerLoaded = 1;
+        }
+
+        this.typingTimer = setTimeout(this.searchResult.bind(this), 1000);
+      } else {
+        this.resultDiv.html("");
+        this.isSpinnerLoaded = 0;
+      }
+    }
+
+    this.previousValue = this.searchTerm.val();
+  }
+
+  searchResult() {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().when(jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(`${this.baseUrl}/posts?search=${this.searchTerm.val()}`), jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(`${this.baseUrl}/pages?search=${this.searchTerm.val()}`)).then((posts, pages) => {
+      let combineResult = posts[0].concat(pages[0]);
+      this.resultDiv.html(`
+  <h2 class="search-overlay__section-title">General Information</h2>
+  ${combineResult.length > 0 ? `<ul class="link-list min-list">
+  ${combineResult.map(item => `
+        <li><a href="${item.link}">${item.title.rendered}</a> ${item.type == "post" ? `by ${item.authorName}` : ""}  </li>
+        `).join("")}
+    </ul> 
+  ` : "<h6>No Result Found<h6>"}
+
+
+  `);
+      this.isSpinnerLoaded = 0;
+    }).catch(e => {
+      this.resultDiv.html(`
+      <h2 class="search-overlay__section-title">Something Went Wrong</h2>`);
+    });
+  }
+
+  openOverlay() {
+    this.overlay.addClass("search-overlay--active");
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").addClass("body-no-scroll");
+    this.isOverlayOpen = 1;
+    this.searchTerm.val("");
+    setTimeout(() => {
+      this.searchTerm.focus();
+    }, 301);
+  }
+
+  closeOverlay() {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").removeClass("body-no-scroll");
+    this.overlay.removeClass("search-overlay--active");
+    this.isOverlayOpen = 0;
+  }
+
+  keyEvents(e) {
+    if (e.keyCode == 83 && !this.isOverlayOpen && !jquery__WEBPACK_IMPORTED_MODULE_0___default()("input,textarea").is(":focus")) {
+      this.openOverlay();
+    }
+
+    if (e.keyCode == 27 && this.isOverlayOpen) {
+      this.closeOverlay();
+    }
+  }
+
+  addSearchHTML() {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").append(`
+      <div class="search-overlay">
+    <div class="search-overlay__top">
+        <div class="container">
+            <i class="fa fa-search search-overlay__icon" aria-hidden="true"></i>
+            <input type="text" placeholder="What are you looking for?" class="search-term" id="search-term">
+            <i class="fa fa-window-close search-overlay__close" aria-hidden="true"></i>
+        </div>
+    </div>
+    <div class="container">
+        <div class="search-overlay__result" id="search-overlay__result">
+        </div>
+    </div>
+</div>
+      `);
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Search);
+
+/***/ }),
+
 /***/ "./css/style.scss":
 /*!************************!*\
   !*** ./css/style.scss ***!
@@ -3981,6 +4112,16 @@ class MobileMenu {
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
+
+/***/ }),
+
+/***/ "jquery":
+/*!*************************!*\
+  !*** external "jQuery" ***!
+  \*************************/
+/***/ (function(module) {
+
+module.exports = window["jQuery"];
 
 /***/ })
 
@@ -4045,6 +4186,18 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 				}
 /******/ 			}
 /******/ 			return result;
+/******/ 		};
+/******/ 	}();
+/******/ 	
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	!function() {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = function(module) {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				function() { return module['default']; } :
+/******/ 				function() { return module; };
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
 /******/ 		};
 /******/ 	}();
 /******/ 	

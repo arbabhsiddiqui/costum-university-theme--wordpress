@@ -98,8 +98,28 @@ $CURRENT_PAGE = $PARENT_PAGE !=null ? $PARENT_PAGE : get_the_ID();
                 $RelateEvents->the_post();
                 get_template_part( 'template-parts/content', 'event');
             }
+        } wp_reset_postdata(  );
+        $relatedCampus = get_field('related_campus');
+        if($relatedCampus){
+            ?>
+    <h2 class="headline headline-medium" style="margin-top:25px"><?= get_the_title(); ?> is Available At theses Campuses
+    </h2>
+    <ul class="min-list link-list">
+        <?php
+    foreach($relatedCampus as $campus){
+        ?>
+        <li><a href=""><?= get_the_title($campus); ?></a></li>
+
+        <?php
+    }
+?>
+    </ul>
+    <?php
+
+
         }
     ?>
+
 </div>
 <?php
 }
